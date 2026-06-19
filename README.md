@@ -1,6 +1,6 @@
-# DCA AI Visual Studio Extension
+# AI Visual Studio Extension
 
-**DCA AI** is a Visual Studio 2022 extension that allows developers to query internal or local AI models directly from the IDE. It supports multiple connection modes (WebSocket, REST, OpenAI-compatible, Open WebUI) and can act as an MCP (Model Context Protocol) server.
+**AI** is a Visual Studio 2022 extension that allows developers to query internal or local AI models directly from the IDE. It supports multiple connection modes (WebSocket, REST, OpenAI-compatible, Open WebUI) and can act as an MCP (Model Context Protocol) server.
 
 ## Features
 
