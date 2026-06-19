@@ -1,0 +1,149 @@
+<DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:vs="http://schemas.microsoft.com/visualstudio/extensibility/2022/xaml"
+              xmlns:styles="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+              xmlns:colors="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0">
+    <Grid Margin="12">
+        <Grid.Resources>
+            <Style TargetType="Label" BasedOn="{StaticResource {x:Static styles:VsResourceKeys.ThemedDialogLabelStyleKey}}" />
+            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Static styles:VsResourceKeys.TextBoxStyleKey}}">
+                <Setter Property="Padding" Value="4,3" />
+            </Style>
+            <Style TargetType="Button" BasedOn="{StaticResource {x:Static styles:VsResourceKeys.ButtonStyleKey}}">
+                <Setter Property="MinWidth" Value="96" />
+                <Setter Property="Padding" Value="10,4" />
+            </Style>
+            <Style TargetType="CheckBox">
+                <Setter Property="Margin" Value="0,0,14,0" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static styles:VsBrushes.WindowTextKey}}" />
+            </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static styles:VsBrushes.WindowTextKey}}" />
+            </Style>
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Title + server readout -->
+        <Grid Grid.Row="0" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Ask Internal AI" FontWeight="Bold" FontSize="15" />
+                <TextBlock Text="Choose what context to include, then ask." Opacity="0.8" />
+            </StackPanel>
+            <Border Grid.Column="1" VerticalAlignment="Top" Padding="6,3" CornerRadius="3"
+              Background="{DynamicResource {x:Static styles:VsBrushes.CommandBarGradientBeginKey}}"
+              BorderThickness="1"
+              BorderBrush="{DynamicResource {x:Static styles:VsBrushes.ActiveBorderKey}}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#x25CF; " Opacity="0.7" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding ServerSummary}" FontSize="11" VerticalAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Context scope checkboxes -->
+        <Border Grid.Row="1" Padding="10" Margin="0,0,0,8"
+            BorderThickness="1" CornerRadius="4"
+            BorderBrush="{DynamicResource {x:Static styles:VsBrushes.ActiveBorderKey}}">
+            <StackPanel>
+                <TextBlock Text="Context" FontWeight="SemiBold" Margin="0,0,0,6" />
+                <WrapPanel>
+                    <CheckBox Content="Selection"   IsChecked="{Binding IncludeSelection}" />
+                    <CheckBox Content="Active file" IsChecked="{Binding IncludeActiveFile}" />
+                    <CheckBox Content="Full project" IsChecked="{Binding IncludeProject}" />
+                    <CheckBox Content="Open tabs"   IsChecked="{Binding IncludeOpenTabs}" />
+                    <CheckBox Content="VS errors"   IsChecked="{Binding IncludeErrors}" />
+                </WrapPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                    <TextBlock Text="Payload: " Opacity="0.8" />
+                    <TextBlock Text="{Binding SizeSummary}" FontWeight="SemiBold">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static styles:VsBrushes.WindowTextKey}}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsOverLimit}" Value="True">
+                                        <Setter Property="Foreground" Value="#E51400" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <Button Content="Refresh size" Command="{Binding RefreshSizeCommand}"
+                  MinWidth="0" Padding="8,2" Margin="12,0,0,0" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Prompt -->
+        <Label Grid.Row="2" Content="Your question (optional)" />
+        <TextBox Grid.Row="3" Text="{Binding Name}" MinHeight="48"
+             TextWrapping="Wrap" AcceptsReturn="True"
+             VerticalScrollBarVisibility="Auto" Margin="0,0,0,8" />
+
+        <!-- Actions -->
+        <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Content="Ask AI" Command="{Binding HelloCommand}"
+              CommandParameter="{Binding Name}"
+              IsEnabled="{Binding IsNotBusy}" Margin="0,0,8,0" />
+            <Button Content="Stop" Command="{Binding StopCommand}"
+              IsEnabled="{Binding IsBusy}" MinWidth="0" Padding="10,4" Margin="0,0,8,0" />
+            <Button Content="Clear" Command="{Binding ClearCommand}" MinWidth="0" Padding="10,4" Margin="0,0,8,0" />
+            <Button Content="Copy" Command="{Binding CopyCommand}" MinWidth="0" Padding="10,4" />
+            <TextBlock Text="{Binding Status}" Opacity="0.85" Margin="12,0,0,0"
+                 VerticalAlignment="Center" TextWrapping="Wrap" />
+        </StackPanel>
+
+        <!-- Pending approval bar (visible only while awaiting Accept/Reject) -->
+        <Border Grid.Row="5" Padding="10" Margin="0,0,0,8" CornerRadius="4" BorderThickness="1"
+            BorderBrush="{DynamicResource {x:Static styles:VsBrushes.ActiveBorderKey}}"
+            Background="{DynamicResource {x:Static styles:VsBrushes.CommandBarGradientBeginKey}}">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsAwaitingApproval}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding PendingApprovalLabel}"
+                     FontWeight="SemiBold" VerticalAlignment="Center" TextWrapping="Wrap"
+                     Margin="0,0,12,0" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="Accept changes" Command="{Binding AcceptChangesCommand}"
+                      FontWeight="SemiBold" Margin="0,0,8,0" />
+                    <Button Content="Reject" Command="{Binding RejectChangesCommand}"
+                      MinWidth="0" Padding="12,4" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Response -->
+        <Border Grid.Row="6" Padding="8" BorderThickness="1" CornerRadius="4"
+            BorderBrush="{DynamicResource {x:Static styles:VsBrushes.ActiveBorderKey}}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <TextBox Text="{Binding Text}" IsReadOnly="True" BorderThickness="0"
+                 Background="Transparent" TextWrapping="Wrap"
+                 FontFamily="Cascadia Mono, Consolas, monospace" />
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</DataTemplate>

@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseWPF>false</UseWPF>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.Shell.17.0">
+      <HintPath>$(VSToolsPath)\Microsoft.VisualStudio.Shell.17.0.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="ConfigToolWindowContent.xaml" />
+    <None Remove="ToolWindow1Content.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ToolWindow1Content.xaml"
+                      LogicalName="DCAAIExtension.ToolWindow1Content.xaml" />
+    <EmbeddedResource Include="ConfigToolWindowContent.xaml"
+                      LogicalName="DCAAIExtension.ConfigToolWindowContent.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Sdk" Version="17.9.2092" />
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Build" Version="17.9.2092" />
+  </ItemGroup>
+</Project>
